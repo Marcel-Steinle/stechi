@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Stechi - Flex Time Calculator</title>
+    <style>
+        :root {
+            --accent-color: #bb1100;
+            --text-color-light: #ffffff;
+            --text-color-dark: #000000;
+        }
+
+        html {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: calc(10px + 0.5vw);
+        }
+
+        body {
+            margin: 0;
+            padding: 1em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.4s, color 0.4s;
+        }
+
+        h1 {
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 1em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background-color: inherit;
+        }
+
+        label {
+            display: block;
+            margin-top: 1em;
+        }
+
+        input, select {
+            width: 97%;
+            padding: 0.5em;
+            margin-top: 0.3em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+        }
+
+        select {
+            width: 100%;
+        }
+
+        button {
+            margin-top: 1em;
+            padding: 0.7em;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #clock {
+            font-size: 1.2em;
+            margin-bottom: 1em;
+        }
+
+        #bottom-right {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        body.light {
+            background-color: #ffffff;
+            color: var(--text-color-dark);
+        }
+
+        body.dark {
+            background-color: #121212;
+            color: var(--text-color-light);
+        }
+
+        body.light input, body.light select, body.light button {
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+        }
+
+        body.dark input, body.dark select, body.dark button {
+            background-color: var(--accent-color);
+            color: var(--text-color-light);
+        }
+    </style>
+</head>
+<body>
+    <h1>Flex Time Calculator</h1>
+    <div id="clock"></div>
+    <div class="container" style="text-align: center;">
+        <label>Use HH:MM format on every field and hit 'Calculate'.</label>
+    </div>
+    <div class="container">
+        <label for="start">Start</label>
+        <input type="time" id="start" value="08:00">
+
+        <label for="end">End</label>
+        <input type="time" id="end" value="17:00">
+
+        <label for="work-hours">Workhours (HH:MM):</label>
+        <input type="text" id="work-hours" value="08:00">
+
+        <label for="pause">Pause (HH:MM):</label>
+        <input type="text" id="pause" value="00:50">
+
+        <label for="glide">Flex Time Delta: </label>
+        <input type="text" id="glide" value="00:00">
+
+        <button onclick="calculate()">Calculate</button>
+        <div id="result"></div>
+    </div>
+
+    <div id="bottom-right">
+        <label for="mode">Modus:</label>
+        <select id="mode" onchange="setMode(this.value)">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('clock').textContent = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function parseTime(str) {
+            const [h, m] = str.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function formatTime(minutes) {
+            const h = Math.floor(Math.abs(minutes) / 60);
+            const m = Math.abs(minutes) % 60;
+            const sign = minutes < 0 ? '-' : '';
+            return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
+        
+        function calculate() {
+            const startStr = document.getElementById('start').value;
+            const endStr   = document.getElementById('end').value;
+            const workStr  = document.getElementById('work-hours').value;
+            const pauseStr = document.getElementById('pause').value;
+            const glideStr = document.getElementById('glide').value;
+
+            // Convert all relevant fields to minutes
+            const workMin  = parseTime(workStr);
+            const pauseMin = parseTime(pauseStr);
+
+            // Track missing fields
+            const missing = [];
+            if (!startStr) missing.push("start");
+            if (!endStr)   missing.push("end");
+            if (!glideStr) missing.push("glide"); // flex time
+
+            // Validate exactly ONE missing
+            if (missing.length !== 1) {
+                document.getElementById('result').textContent =
+                    "Start, End, or Flex Time must be empty to calculate.";
+                return;
+            }
+
+            let resultText = "";
+
+            if (missing[0] === "end") {
+                // Calculate END time
+                const startMin = parseTime(startStr);
+                const glideMin = parseTime(glideStr.replace("-", "")) *
+                                (glideStr.startsWith("-") ? -1 : 1);
+
+                const endMin = startMin + workMin + pauseMin + glideMin;
+
+                resultText = `Clock out at ${formatTime(endMin)}.`;
+            }
+
+            else if (missing[0] === "start") {
+                // Calculate START time
+                const endMin   = parseTime(endStr);
+                const glideMin = parseTime(glideStr.replace("-", "")) *
+                                (glideStr.startsWith("-") ? -1 : 1);
+
+                const startMin = endMin - workMin - pauseMin - glideMin;
+
+                resultText = `Clock in at ${formatTime(startMin)}.`;
+            }
+
+            else if (missing[0] === "glide") {
+                // Calculate FLEX TIME
+                const startMin = parseTime(startStr);
+                const endMin   = parseTime(endStr);
+
+                const actualWorked = endMin - startMin - pauseMin;
+                const glideMin     = actualWorked - workMin;
+
+                resultText = `Yielded flex time: ${formatTime(glideMin)}.`;
+            }
+
+            document.getElementById('result').textContent = resultText;
+        }
+
+        function setMode(mode) {
+            if (mode === 'light') {
+                document.body.className = 'light';
+            } else if (mode === 'dark') {
+                document.body.className = 'dark';
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.body.className = prefersDark ? 'dark' : 'light';
+            }
+        }
+
+        setMode(document.getElementById('mode').value);
+    </script>
+</body>
+</html>
