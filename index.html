@@ -4,130 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Stechi - Flex Time Calculator</title>
-    <style>
-        :root {
-            --accent-color: #bb1100;
-            --text-color-light: #ffffff;
-            --text-color-dark: #000000;
-        }
-
-        html {
-            font-family: 'Segoe UI', sans-serif;
-            font-size: calc(10px + 0.5vw);
-        }
-
-        body {
-            margin: 0;
-            padding: 1em;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: background-color 0.4s, color 0.4s;
-        }
-
-        h1 {
-            background-color: var(--accent-color);
-            color: var(--text-color-light);
-            padding: 0.5em 1em;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-            padding: 1em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            background-color: inherit;
-        }
-
-        label {
-            display: block;
-            margin-top: 1em;
-        }
-
-        input, select {
-            width: 97%;
-            padding: 0.5em;
-            margin-top: 0.3em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: var(--accent-color);
-            color: var(--text-color-light);
-        }
-
-        select {
-            width: 100%;
-        }
-
-        button {
-            margin-top: 1em;
-            padding: 0.7em;
-            width: 100%;
-            background-color: var(--accent-color);
-            color: var(--text-color-light);
-            border: none;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
-        #clock {
-            font-size: 1.2em;
-            margin-bottom: 1em;
-        }
-
-        #bottom-right {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-        }
-
-        body.light {
-            background-color: #ffffff;
-            color: var(--text-color-dark);
-        }
-
-        body.dark {
-            background-color: #121212;
-            color: var(--text-color-light);
-        }
-
-        body.light input, body.light select, body.light button {
-            background-color: var(--accent-color);
-            color: var(--text-color-light);
-        }
-
-        body.dark input, body.dark select, body.dark button {
-            background-color: var(--accent-color);
-            color: var(--text-color-light);
-        }
-    </style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Flex Time Calculator</h1>
     <div id="clock"></div>
-    <div class="container" style="text-align: center;">
-        <label>Use HH:MM format on every field and hit 'Calculate'.</label>
-    </div>
     <div class="container">
-        <label for="start">Start</label>
-        <input type="time" id="start" value="08:00">
+        <div class="field-group">
+            <label for="start">Start</label>
+            <div class="time-input-wrap">
+                <button type="button" class="step-btn" data-action="decrease" data-target="start" aria-label="Decrease start">−</button>
+                <input type="text" id="start" class="time-input" inputmode="numeric" autocomplete="off" placeholder="HH:MM" data-kind="time">
+                <button type="button" class="step-btn" data-action="increase" data-target="start" aria-label="Increase start">+</button>
+                <button type="button" class="clear-btn" data-action="clear" data-target="start" aria-label="Clear start">✕</button>
+            </div>
+        </div>
 
-        <label for="end">End</label>
-        <input type="time" id="end" value="17:00">
+        <div class="field-group">
+            <label for="end">End</label>
+            <div class="time-input-wrap">
+                <button type="button" class="step-btn" data-action="decrease" data-target="end" aria-label="Decrease end">−</button>
+                <input type="text" id="end" class="time-input" inputmode="numeric" autocomplete="off" placeholder="HH:MM" data-kind="time">
+                <button type="button" class="step-btn" data-action="increase" data-target="end" aria-label="Increase end">+</button>
+                <button type="button" class="clear-btn" data-action="clear" data-target="end" aria-label="Clear end">✕</button>
+                <button type="button" class="now-btn" data-action="now" data-target="end">Now</button>
+            </div>
+        </div>
 
-        <label for="work-hours">Workhours (HH:MM):</label>
-        <input type="text" id="work-hours" value="08:00">
+        <div class="field-group">
+            <label for="work-hours">Workhours (HH:MM)</label>
+            <div class="time-input-wrap">
+                <button type="button" class="step-btn" data-action="decrease" data-target="work-hours" aria-label="Decrease work hours">−</button>
+                <input type="text" id="work-hours" class="time-input" inputmode="numeric" autocomplete="off" placeholder="HH:MM" data-kind="duration">
+                <button type="button" class="step-btn" data-action="increase" data-target="work-hours" aria-label="Increase work hours">+</button>
+                <button type="button" class="clear-btn" data-action="clear" data-target="work-hours" aria-label="Clear work hours">✕</button>
+            </div>
+        </div>
 
-        <label for="pause">Pause (HH:MM):</label>
-        <input type="text" id="pause" value="00:50">
+        <div class="field-group">
+            <label for="pause">Pause (HH:MM)</label>
+            <div class="time-input-wrap">
+                <button type="button" class="step-btn" data-action="decrease" data-target="pause" aria-label="Decrease pause">−</button>
+                <input type="text" id="pause" class="time-input" inputmode="numeric" autocomplete="off" placeholder="HH:MM" data-kind="duration">
+                <button type="button" class="step-btn" data-action="increase" data-target="pause" aria-label="Increase pause">+</button>
+                <button type="button" class="clear-btn" data-action="clear" data-target="pause" aria-label="Clear pause">✕</button>
+            </div>
+        </div>
 
-        <label for="glide">Flex Time Delta: </label>
-        <input type="text" id="glide" value="00:00">
+        <div class="field-group">
+            <label for="glide">Flex Time Delta</label>
+            <div class="time-input-wrap">
+                <button type="button" class="step-btn" data-action="decrease" data-target="glide" aria-label="Decrease flex delta">−</button>
+                <input type="text" id="glide" class="time-input" inputmode="numeric" autocomplete="off" placeholder="HH:MM" data-kind="flex">
+                <button type="button" class="step-btn" data-action="increase" data-target="glide" aria-label="Increase flex delta">+</button>
+                <button type="button" class="clear-btn" data-action="clear" data-target="glide" aria-label="Clear flex delta">✕</button>
+            </div>
+        </div>
 
-        <button onclick="calculate()">Calculate</button>
         <div id="result"></div>
     </div>
 
@@ -150,8 +84,15 @@
         updateClock();
 
         function parseTime(str) {
-            const [h, m] = str.split(':').map(Number);
-            return h * 60 + m;
+            if (!str) return null;
+            const text = String(str).trim();
+            if (!text) return null;
+            const normalized = normalizeInputValue(text, 'time');
+            if (!normalized) return null;
+            const negative = normalized.startsWith('-');
+            const [hoursStr = '0', minutesStr = '0'] = normalized.replace(/-/g, '').split(':');
+            const total = Number(hoursStr) * 60 + Number(minutesStr);
+            return negative ? -total : total;
         }
 
         function formatTime(minutes) {
@@ -161,7 +102,189 @@
             return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
 
-        
+        function normalizeInputValue(rawValue, kind = 'time') {
+            const value = String(rawValue ?? '').trim();
+            if (!value) return '';
+
+            const negative = value.startsWith('-');
+            const digits = value.replace(/-/g, '').replace(/[^0-9]/g, '');
+            if (!digits) return negative ? '-' : '';
+
+            if (value.includes(':')) {
+                const [hoursPart = '0', minutesPart = '0'] = value.split(':');
+                const hours = String(Math.min(Number(hoursPart) || 0, 23)).padStart(2, '0');
+                const minutes = String(Math.min(Number(minutesPart) || 0, 59)).padStart(2, '0');
+                return `${negative ? '-' : ''}${hours}:${minutes}`;
+            }
+
+            const compact = digits.replace(/^0+(?=\d)/, '') || '0';
+            let hours = 0;
+            let minutes = 0;
+
+            if (compact.length <= 2) {
+                minutes = Number(compact);
+            } else if (compact.length === 3) {
+                hours = Number(compact[0]);
+                minutes = Number(compact.slice(1));
+            } else {
+                hours = Number(compact.slice(0, 2));
+                minutes = Number(compact.slice(2));
+            }
+
+            hours = Math.min(hours, 23);
+            minutes = Math.min(minutes, 59);
+
+            const sign = negative ? '-' : '';
+            const hoursText = String(hours).padStart(2, '0');
+            const minutesText = String(minutes).padStart(2, '0');
+            return `${sign}${hoursText}:${minutesText}`;
+        }
+
+        function adjustFieldValue(id, delta) {
+            const input = document.getElementById(id);
+            if (!input) return;
+
+            const kind = input.dataset.kind || 'time';
+            const current = parseTime(input.value);
+            let nextMinutes = current ?? 0;
+
+            if (kind === 'time') {
+                nextMinutes = ((nextMinutes + delta) % (24 * 60) + 24 * 60) % (24 * 60);
+            } else if (kind === 'flex') {
+                nextMinutes += delta;
+            } else {
+                nextMinutes = Math.max(0, nextMinutes + delta);
+            }
+
+            input.value = kind === 'flex'
+                ? `${nextMinutes < 0 ? '-' : ''}${formatTime(Math.abs(nextMinutes))}`
+                : formatTime(nextMinutes);
+        }
+
+        function clearFieldValue(id) {
+            const input = document.getElementById(id);
+            if (input) input.value = '';
+            input.classList.remove('highlight-success');
+        }
+
+        function insertCurrentTime(id) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            const now = new Date();
+            const value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            input.value = value;
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.highlight-success').forEach((element) => {
+                element.classList.remove('highlight-success');
+            });
+        }
+
+        function applyCalculatedValue(targetId, value) {
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            clearHighlights();
+            input.value = value;
+            input.classList.add('highlight-success');
+            input.focus();
+            input.select();
+        }
+
+        function calculateFromFilledFields() {
+            const values = {
+                start: document.getElementById('start').value,
+                end: document.getElementById('end').value,
+                work: document.getElementById('work-hours').value,
+                pause: document.getElementById('pause').value,
+                glide: document.getElementById('glide').value
+            };
+
+            const filled = Object.entries(values).filter(([, value]) => value && value.trim());
+            if (filled.length !== 4) {
+                return false;
+            }
+
+            const missingKey = Object.keys(values).find((key) => !values[key] || !values[key].trim());
+            if (!missingKey) {
+                return false;
+            }
+
+            const normalizedValues = {
+                start: normalizeInputValue(values.start, 'time'),
+                end: normalizeInputValue(values.end, 'time'),
+                work: normalizeInputValue(values.work, 'duration'),
+                pause: normalizeInputValue(values.pause, 'duration'),
+                glide: normalizeInputValue(values.glide, 'flex')
+            };
+
+            const workMin = parseTime(normalizedValues.work) || 0;
+            const pauseMin = parseTime(normalizedValues.pause) || 0;
+            const startMin = parseTime(normalizedValues.start);
+            const endMin = parseTime(normalizedValues.end);
+            const glideMin = parseTime(normalizedValues.glide) || 0;
+
+            let resultValue = '';
+            if (missingKey === 'start') {
+                resultValue = formatTime(endMin - workMin - pauseMin - glideMin);
+            } else if (missingKey === 'end') {
+                resultValue = formatTime(startMin + workMin + pauseMin + glideMin);
+            } else if (missingKey === 'glide') {
+                resultValue = formatTime((endMin - startMin - pauseMin) - workMin);
+            }
+
+            if (!resultValue) {
+                return false;
+            }
+
+            const targetId = missingKey === 'start' ? 'start' : missingKey === 'end' ? 'end' : 'glide';
+            applyCalculatedValue(targetId, resultValue);
+            return true;
+        }
+
+        function wireTimeInputs() {
+            const inputs = Array.from(document.querySelectorAll('.time-input'));
+
+            inputs.forEach((input, index) => {
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        input.value = normalizeInputValue(input.value, input.dataset.kind || 'time');
+
+                        if (calculateFromFilledFields()) {
+                            return;
+                        }
+
+                        const nextInput = inputs[index + 1];
+                        if (nextInput) {
+                            nextInput.focus();
+                            nextInput.select();
+                        }
+                    }
+                });
+                input.addEventListener('blur', () => {
+                    input.value = normalizeInputValue(input.value, input.dataset.kind || 'time');
+                });
+            });
+
+            document.querySelectorAll('[data-action]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const action = button.dataset.action;
+                    const target = button.dataset.target;
+
+                    if (action === 'increase') {
+                        adjustFieldValue(target, 1);
+                    } else if (action === 'decrease') {
+                        adjustFieldValue(target, -1);
+                    } else if (action === 'clear') {
+                        clearFieldValue(target);
+                    } else if (action === 'now') {
+                        insertCurrentTime(target);
+                    }
+                });
+            });
+        }
+
         function calculate() {
             const startStr = document.getElementById('start').value;
             const endStr   = document.getElementById('end').value;
@@ -169,55 +292,41 @@
             const pauseStr = document.getElementById('pause').value;
             const glideStr = document.getElementById('glide').value;
 
-            // Convert all relevant fields to minutes
-            const workMin  = parseTime(workStr);
-            const pauseMin = parseTime(pauseStr);
+            const workMin  = parseTime(workStr) || 0;
+            const pauseMin = parseTime(pauseStr) || 0;
 
-            // Track missing fields
             const missing = [];
-            if (!startStr) missing.push("start");
-            if (!endStr)   missing.push("end");
-            if (!glideStr) missing.push("glide"); // flex time
+            if (!startStr) missing.push('start');
+            if (!endStr)   missing.push('end');
+            if (!glideStr) missing.push('glide');
 
-            // Validate exactly ONE missing
             if (missing.length !== 1) {
                 document.getElementById('result').textContent =
-                    "Start, End, or Flex Time must be empty to calculate.";
+                    'Start, End, or Flex Time must be empty to calculate.';
                 return;
             }
 
-            let resultText = "";
+            let resultText = '';
 
-            if (missing[0] === "end") {
-                // Calculate END time
+            if (missing[0] === 'end') {
                 const startMin = parseTime(startStr);
-                const glideMin = parseTime(glideStr.replace("-", "")) *
-                                (glideStr.startsWith("-") ? -1 : 1);
-
+                const glideMin = parseTime(glideStr) || 0;
                 const endMin = startMin + workMin + pauseMin + glideMin;
-
                 resultText = `Clock out at ${formatTime(endMin)}.`;
             }
 
-            else if (missing[0] === "start") {
-                // Calculate START time
+            else if (missing[0] === 'start') {
                 const endMin   = parseTime(endStr);
-                const glideMin = parseTime(glideStr.replace("-", "")) *
-                                (glideStr.startsWith("-") ? -1 : 1);
-
+                const glideMin = parseTime(glideStr) || 0;
                 const startMin = endMin - workMin - pauseMin - glideMin;
-
                 resultText = `Clock in at ${formatTime(startMin)}.`;
             }
 
-            else if (missing[0] === "glide") {
-                // Calculate FLEX TIME
+            else if (missing[0] === 'glide') {
                 const startMin = parseTime(startStr);
                 const endMin   = parseTime(endStr);
-
                 const actualWorked = endMin - startMin - pauseMin;
                 const glideMin     = actualWorked - workMin;
-
                 resultText = `Yielded flex time: ${formatTime(glideMin)}.`;
             }
 
@@ -235,6 +344,7 @@
             }
         }
 
+        wireTimeInputs();
         setMode(document.getElementById('mode').value);
     </script>
 </body>

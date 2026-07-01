@@ -1,0 +1,141 @@
+:root {
+    --accent-color: #bb1100;
+    --text-color-light: #ffffff;
+    --text-color-dark: #000000;
+}
+
+html {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: calc(10px + 0.5vw);
+}
+
+body {
+    margin: 0;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.4s, color 0.4s;
+}
+
+h1 {
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    padding: 1em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background-color: inherit;
+}
+
+label {
+    display: block;
+    margin-top: 1em;
+}
+
+.field-group {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    flex: 1 1 220px;
+}
+
+.time-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.3em;
+}
+
+.time-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6em 0.7em;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+    font-size: 1rem;
+}
+
+.time-input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+.step-btn, .clear-btn, .now-btn, .action-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 0.55em 0.7em;
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.step-btn {
+    min-width: 2.2em;
+}
+
+select {
+    width: 100%;
+    padding: 0.5em;
+    margin-top: 0.3em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+}
+
+#clock {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+}
+
+#bottom-right {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
+
+body.light {
+    background-color: #ffffff;
+    color: var(--text-color-dark);
+}
+
+body.dark {
+    background-color: #121212;
+    color: var(--text-color-light);
+}
+
+body.light .time-input,
+body.light select,
+body.light .step-btn,
+body.light .clear-btn,
+body.light .now-btn,
+body.light .action-btn {
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+}
+
+body.dark .time-input,
+body.dark select,
+body.dark .step-btn,
+body.dark .clear-btn,
+body.dark .now-btn,
+body.dark .action-btn {
+    background-color: var(--accent-color);
+    color: var(--text-color-light);
+}
+
+.highlight-success {
+    background-color: #2e7d32 !important;
+    color: #ffffff !important;
+    border-color: #2e7d32 !important;
+}
