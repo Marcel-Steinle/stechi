@@ -83,41 +83,33 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        function parseTime(str) {
+        function stringToMinutes(str) {
             if (!str) return null;
             const text = String(str).trim();
             if (!text) return null;
-            const normalized = normalizeInputValue(text, 'time');
-            if (!normalized) return null;
-            const negative = normalized.startsWith('-');
-            const [hoursStr = '0', minutesStr = '0'] = normalized.replace(/-/g, '').split(':');
+            const parsed = parseUserInput(text, 'time');
+            if (!parsed) return null;
+            const negative = parsed.startsWith('-');
+            const [hoursStr = '0', minutesStr = '0'] = parsed.replace(/-/g, '').split(':');
             const total = Number(hoursStr) * 60 + Number(minutesStr);
             return negative ? -total : total;
         }
 
-        function formatTime(minutes) {
+        function minutesToString(minutes) {
             const h = Math.floor(Math.abs(minutes) / 60);
             const m = Math.abs(minutes) % 60;
             const sign = minutes < 0 ? '-' : '';
             return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
 
-        function normalizeInputValue(rawValue, kind = 'time') {
+        function parseUserInput(rawValue, kind = 'time') {
             const value = String(rawValue ?? '').trim();
             if (!value) return '';
 
             const negative = value.startsWith('-');
-            const digits = value.replace(/-/g, '').replace(/[^0-9]/g, '');
-            if (!digits) return negative ? '-' : '';
 
-            if (value.includes(':')) {
-                const [hoursPart = '0', minutesPart = '0'] = value.split(':');
-                const hours = String(Math.min(Number(hoursPart) || 0, 23)).padStart(2, '0');
-                const minutes = String(Math.min(Number(minutesPart) || 0, 59)).padStart(2, '0');
-                return `${negative ? '-' : ''}${hours}:${minutes}`;
-            }
-
-            const compact = digits.replace(/^0+(?=\d)/, '') || '0';
+            const digits = value.replace(/-/g, '').replace(/[^0-9]/g, ''); // remove minus and non-digits
+            const compact = digits.replace(/^0+(?=\d)/, '') || '0'; // Write as HHMM
             let hours = 0;
             let minutes = 0;
 
@@ -140,12 +132,12 @@
             return `${sign}${hoursText}:${minutesText}`;
         }
 
-        function adjustFieldValue(id, delta) {
+        function incDecFieldValue(id, delta) {
             const input = document.getElementById(id);
             if (!input) return;
 
             const kind = input.dataset.kind || 'time';
-            const current = parseTime(input.value);
+            const current = stringToMinutes(input.value);
             let nextMinutes = current ?? 0;
 
             if (kind === 'time') {
@@ -157,8 +149,8 @@
             }
 
             input.value = kind === 'flex'
-                ? `${nextMinutes < 0 ? '-' : ''}${formatTime(Math.abs(nextMinutes))}`
-                : formatTime(nextMinutes);
+                ? `${nextMinutes < 0 ? '-' : ''}${minutesToString(Math.abs(nextMinutes))}`
+                : minutesToString(nextMinutes);
         }
 
         function clearFieldValue(id) {
@@ -210,27 +202,27 @@
                 return false;
             }
 
-            const normalizedValues = {
-                start: normalizeInputValue(values.start, 'time'),
-                end: normalizeInputValue(values.end, 'time'),
-                work: normalizeInputValue(values.work, 'duration'),
-                pause: normalizeInputValue(values.pause, 'duration'),
-                glide: normalizeInputValue(values.glide, 'flex')
+            const parsedValues = {
+                start: parseUserInput(values.start, 'time'),
+                end: parseUserInput(values.end, 'time'),
+                work: parseUserInput(values.work, 'duration'),
+                pause: parseUserInput(values.pause, 'duration'),
+                glide: parseUserInput(values.glide, 'flex')
             };
 
-            const workMin = parseTime(normalizedValues.work) || 0;
-            const pauseMin = parseTime(normalizedValues.pause) || 0;
-            const startMin = parseTime(normalizedValues.start);
-            const endMin = parseTime(normalizedValues.end);
-            const glideMin = parseTime(normalizedValues.glide) || 0;
+            const workMin = stringToMinutes(parsedValues.work) || 0;
+            const pauseMin = stringToMinutes(parsedValues.pause) || 0;
+            const startMin = stringToMinutes(parsedValues.start);
+            const endMin = stringToMinutes(parsedValues.end);
+            const glideMin = stringToMinutes(parsedValues.glide) || 0;
 
             let resultValue = '';
             if (missingKey === 'start') {
-                resultValue = formatTime(endMin - workMin - pauseMin - glideMin);
+                resultValue = minutesToString(endMin - workMin - pauseMin - glideMin);
             } else if (missingKey === 'end') {
-                resultValue = formatTime(startMin + workMin + pauseMin + glideMin);
+                resultValue = minutesToString(startMin + workMin + pauseMin + glideMin);
             } else if (missingKey === 'glide') {
-                resultValue = formatTime((endMin - startMin - pauseMin) - workMin);
+                resultValue = minutesToString((endMin - startMin - pauseMin) - workMin);
             }
 
             if (!resultValue) {
@@ -249,7 +241,7 @@
                 input.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault();
-                        input.value = normalizeInputValue(input.value, input.dataset.kind || 'time');
+                        input.value = parseUserInput(input.value, input.dataset.kind || 'time');
 
                         if (calculateFromFilledFields()) {
                             return;
@@ -263,7 +255,7 @@
                     }
                 });
                 input.addEventListener('blur', () => {
-                    input.value = normalizeInputValue(input.value, input.dataset.kind || 'time');
+                    input.value = parseUserInput(input.value, input.dataset.kind || 'time');
                 });
             });
 
@@ -273,9 +265,9 @@
                     const target = button.dataset.target;
 
                     if (action === 'increase') {
-                        adjustFieldValue(target, 1);
+                        incDecFieldValue(target, 1);
                     } else if (action === 'decrease') {
-                        adjustFieldValue(target, -1);
+                        incDecFieldValue(target, -1);
                     } else if (action === 'clear') {
                         clearFieldValue(target);
                     } else if (action === 'now') {
@@ -283,54 +275,6 @@
                     }
                 });
             });
-        }
-
-        function calculate() {
-            const startStr = document.getElementById('start').value;
-            const endStr   = document.getElementById('end').value;
-            const workStr  = document.getElementById('work-hours').value;
-            const pauseStr = document.getElementById('pause').value;
-            const glideStr = document.getElementById('glide').value;
-
-            const workMin  = parseTime(workStr) || 0;
-            const pauseMin = parseTime(pauseStr) || 0;
-
-            const missing = [];
-            if (!startStr) missing.push('start');
-            if (!endStr)   missing.push('end');
-            if (!glideStr) missing.push('glide');
-
-            if (missing.length !== 1) {
-                document.getElementById('result').textContent =
-                    'Start, End, or Flex Time must be empty to calculate.';
-                return;
-            }
-
-            let resultText = '';
-
-            if (missing[0] === 'end') {
-                const startMin = parseTime(startStr);
-                const glideMin = parseTime(glideStr) || 0;
-                const endMin = startMin + workMin + pauseMin + glideMin;
-                resultText = `Clock out at ${formatTime(endMin)}.`;
-            }
-
-            else if (missing[0] === 'start') {
-                const endMin   = parseTime(endStr);
-                const glideMin = parseTime(glideStr) || 0;
-                const startMin = endMin - workMin - pauseMin - glideMin;
-                resultText = `Clock in at ${formatTime(startMin)}.`;
-            }
-
-            else if (missing[0] === 'glide') {
-                const startMin = parseTime(startStr);
-                const endMin   = parseTime(endStr);
-                const actualWorked = endMin - startMin - pauseMin;
-                const glideMin     = actualWorked - workMin;
-                resultText = `Yielded flex time: ${formatTime(glideMin)}.`;
-            }
-
-            document.getElementById('result').textContent = resultText;
         }
 
         function setMode(mode) {
